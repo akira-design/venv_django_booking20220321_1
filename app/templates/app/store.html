@@ -1,0 +1,42 @@
+{% extends "app/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="text-center my-5">
+    <div class="row mb-5">
+        <div class="col">
+            <h2>店舗一覧</h2>
+        </div>
+        <div class="col">
+            <h2>患者情報</h2>
+                {% for message in messages %}
+                    <h3>{{ message }}</h3>
+                {% endfor %}
+            <p>ID:{{ pt_id }}</p>
+            <p>患者名:{{ pt_name }}</p>
+        </div>
+    </div>
+    <div class="row">
+        {% for store in store_list %}
+            <div class="col-lg-3 col-md-3 col-sm-3">
+                <div class="card img-thumbnail storelist mb-3">
+                    <img class="card-img-top card-thum" src="{{ store.image.url }}" alt="">
+                    <div class="card-body text-center px-2 py-3">
+                        <h5 class="font-weight-bold">{{ store.name }}店</h5>
+                        <p>{{ store.address }}</p>
+                    </div>
+                    <a class="stretched-link" href="{% url 'staff' store.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                </div>
+            </div>
+        {% empty %}
+            <p>まだ店舗がありません</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
+{% block month %}
+
+
+{% endblock %}

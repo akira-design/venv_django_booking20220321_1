@@ -1,0 +1,71 @@
+{% extends "app/base.html" %}
+{% load booking %}
+
+{% block content %}
+<div class="text-center my-5">
+    <div class="mb-3">
+        <h1>予約カレンダー</h1>
+        <p>{{ week_first }}～{{ week_last }}</p>
+    </div>
+
+    <div class="d-flex mb-2">
+        <div class="mx-3 mr-auto">
+            <a class="btn btn-warning" href="{% url 'mypage' user.pk week_previous.year week_previous.month week_previous.day %}?pt_id={{pt_id}}&pt_name={{pt_name}}">前週</a>
+        </div>
+        <div class="mx-3">
+            <a class="btn btn-warning" href="{% url 'mypage' user.pk week_next.year week_next.month week_next.day %}?pt_id={{pt_id}}&pt_name={{pt_name}}">次週</a>
+        </div>
+    </div>
+    <div class="">
+        <table class="table table-bordered bg-light">
+            <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    {% for day in week_days %}
+                        {% if day.weekday == 5 %}
+                            <th scope="col" class="text-primary">{{ day | date:"d(D)" }}</th>
+                        {% elif day.weekday == 6 %}
+                            <th scope="col" class="text-danger">{{ day | date:"d(D)" }}</th>
+                        {% else %}
+                            <th scope="col">{{ day | date:"d(D)" }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for hour, schedules in week_day_schedules.items %}
+                    <tr>
+                        <td scope="row">{{ hour }}:00</td>
+                        {% for datetime, book in schedules.items %}
+                            <td>
+                                {% is_1hour_later datetime hour as ok %}
+                                {% if not ok %}
+                                    -
+                                {% elif book|length < 1 %}
+                                    <form method="POST" action="{% url 'holiday' datetime.year datetime.month datetime.day hour %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-light" type="submit">出勤</button>
+                                    </form>
+                                {% else %}
+                                    {% for b in book %}
+                                        {% if b.pt_data.pt_id == None %}
+                                            <p class="mb-0">休み</p>
+                                        {% else %}
+                                            <p class="mb-0 font-weight-bold text-success">ID:{{ b.pt_data.pt_id }}様</p>
+                                            <p class="mb-0 font-weight-bold text-success">{{ b.pt_data.pt_name }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <form method="POST" action="{% url 'delete' datetime.year datetime.month datetime.day hour %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-danger" type="submit">取消</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

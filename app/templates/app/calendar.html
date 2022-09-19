@@ -1,0 +1,154 @@
+{% extends "app/base.html" %}
+{% load booking %}
+
+{% block content %}
+<div class="text-center my-5">
+    <div class="row">
+        <div class="col-md-2 mb-4 text-center calendar">
+            <img src="{{ staff_data.user.image.url }}" class="img-thumbnail" alt="">
+        </div>
+
+        <div class="col-md-4 mb-5">
+            <div class="card">
+                <div class="card-body px-2 py-1">
+                    <div class="p-4 text-left">
+                        <h3>{{ staff_data.user.first_name }} {{ staff_data.user.last_name }}</h3>
+                        <hr>
+                        <p>店舗：{{ staff_data.store.name }}店</p>
+                        <p>{{ staff_data.user.description|linebreaksbr }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 検索結果の数 -->
+        <div class="col-md-4 mb-5">
+            {% if query %}
+            <h3>検索結果</h3>
+                {% for b in books %}
+                    <p class="text-center font-weight-bold h6">
+                        {{ b.date }}
+                        {{ b.pt_name }}
+                        {{ b.staff.user.first_name }}
+                    </p>
+                {% endfor %}
+            {% endif%}
+        </div>
+        <!-- 検索結果の数 -->
+
+    </div>
+
+    <div class="mb-3">
+        <h1>予約カレンダー</h1>
+        <p>{{ week_first }}～{{ week_last }}</p>
+    </div>
+
+    <div class="d-flex mb-2">
+        <div class="mx-3 mr-auto">
+            <a class="btn btn-warning" href="{% url 'calendar' staff_data.pk week_previous.year week_previous.month week_previous.day %}?pt_id={{pt_id}}&pt_name={{pt_name}}">前週</a>
+        </div>
+        <div class="mx-3">
+            <a class="btn btn-warning" href="{% url 'calendar' staff_data.pk week_next.year week_next.month week_next.day %}?pt_id={{pt_id}}&pt_name={{pt_name}}">次週</a>
+        </div>
+    </div>
+    <div class="">
+        <table class="table table-bordered bg-light">
+            <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    {% for day in week_days %}
+                        {% if day.weekday == 5 %}
+                            <th scope="col" class="text-primary">{{ day | date:"d(D)" }}</th>
+                        {% elif day.weekday == 6 %}
+                            <th scope="col" class="text-danger">{{ day | date:"d(D)" }}</th>
+                        {% else %}
+                            <th scope="col">{{ day | date:"d(D)" }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for hour, schedules in week_day_schedules.items %}
+                    <tr>
+                        <td scope="row">{{ hour }}:00</td>
+                        {% for datetime, book in schedules.items %}
+                            <td>
+                                {% is_1hour_later datetime hour as ok %}
+                                {% if not ok %}
+                                    -
+                                {% elif book|length < 1 %}
+                                    <a href="{% url 'booking' staff_data.pk datetime.year datetime.month datetime.day hour %}?pt_id={{pt_id}}&pt_name={{pt_name}}">
+                                        ○
+                                    </a>
+                                {% else %}
+                                    {% for b in book %}
+                                        <a href="#" class="fs-7 m-sm-0">ID:{{b.pt_data.pt_id}}<br>氏名:{{b.pt_data.pt_name}}</a>
+                                    {% endfor %}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block month %}
+<div class="">
+    <a href="{% url 'calendar' staff_data.pk month_previous.year month_previous.month %}">前月</a>
+    {{ month_current | date:"Y年m月" }}
+    <a href="{% url 'calendar' staff_data.pk month_next.year month_next.month %}">次月</a>
+    <table class="table table-sm table-light fs-7" >
+        <thead>
+            <tr>
+                {% for w in week_names %}
+                    <th>{{ w }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for week_day_schedles in month_day_schedules %}
+                <tr>
+                    {% for day, schedules in week_day_schedles.items %}
+                        {% if today == day %}
+                            <td class="table-danger">
+                                {% else %}
+                            <td>
+                        {% endif %}
+                            <div>
+                                {% if month_current.month != day.month %}
+                                    -
+                                {% else %}
+                                    <a href="{% url 'calendar' staff_data.pk day.year day.month day.day %}">{{ day.day }}</a>
+                                    <p class="m-sm-0">
+                                    {% for b in schedules %}
+                                        staff{{b.staff.id}}
+                                    {% endfor %}
+                                    </p>
+                                    {% if schedules|length < 1 %}
+                                        <i class="fa-regular fa-circle text-info" style="font-size:10px"></i>
+                                    {% elif schedules|length < 8 %}
+                                        <i class="fa-solid fa-xmark" style="font-size:10px"></i>
+                                    {% else %}
+                                        <i class="fa-light fa-triangle"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- 検索フォーム -->
+    <div class="d-flex justify-content-center">
+        <form class="form-inline my-2" method="GET" action="{% url 'calendar' staff_data.pk %}">
+            <input type="text" class="form-control" name="q" value="{{request.GET.q}}">
+            <button type="submit" value="search" class="btn btn-primary">検索</button>
+        </form>
+    </div>
+    <!-- 検索フォーム -->
+</div>
+{% endblock %}

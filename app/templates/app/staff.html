@@ -1,0 +1,28 @@
+{% extends "app/base.html" %}
+
+{% block content %}
+
+<div class="text-center my-5">
+    <div class="row">
+        <div class="p-4 text-left">
+            <h3>{{ store_data.name }}店&nbspスタッフ一覧</h3>
+        </div>
+    </div>
+    <div class="row">
+        {% for staff in staff_data %}
+            <div class="col-lg-3 col-md-3 col-sm-3">
+                <div class="card img-thumbnail mb-3">
+                    <img class="card-img-top img-thumbnail" src="{{ staff.user.image.url }}" alt="">
+                    <div class="card-body text-center px-2 pt-2">
+                        <h5 class="font-weight-bold">{{ staff.user.first_name }} {{ staff.user.last_name }}</h5>
+                    </div>
+                    <a class="stretched-link" href="{% url 'calendar' staff.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                </div>
+            </div>
+        {% empty %}
+            <p>まだスタッフがいません</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

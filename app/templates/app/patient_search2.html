@@ -1,0 +1,56 @@
+{% extends "app/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<!-- 検索フォーム -->
+<div class="text-center my-5">
+    <div class="mb-5">
+        <h1>検索条件</h1>
+    </div>
+    <form method="GET">
+        <div class="col-lg-6 offset-lg-4 my-3">
+            <table class="booking_table mb-3">
+                <tbody>
+                    <tr>
+                        <th class="header">ID</th>
+                            <td class="data">
+                                <input type="text" class="form-control" name="keyword" placeholder="ID">
+                            </td>
+                        <tr>
+                            <th class="header">患者名</th>
+                            <td class="data">
+                                <input type="text" class="form-control" name="">
+                            </td>
+                        </tr>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mb-3">
+            <div class="button">
+                <button class="btn btn-lg btn-warning btn-block" type="submit">検索</button>
+            </div>
+        </div>
+    </form>
+        <!-- 一覧表示 -->
+
+        {{ pt_data }}
+        <br>
+        <div class="mb-5">
+            {% for message in messages %}
+                <h3>{{ message }}</h3>
+            {% endfor %}
+        </div>
+        {% for patient in booking_list %}
+            <ul>
+                <li>
+                    ID:{{ patient.pt_data.pt_id }}
+                    氏名:{{ patient.pt_data.pt_name }}
+                    予約日:{{ patient.start }}
+                    <a href="#">詳細</a>
+                </li>
+            </ul>
+        {% endfor %}
+
+</div>
+{% endblock %}
