@@ -68,7 +68,6 @@ class PatientSearchView(ListView):
     #         # 何も返さない
     #         return Booking.objects.none()
 
-
     def get_queryset(self):
         queryset = Booking.objects.order_by('-id')
         keyword = self.request.GET.get('keyword')
@@ -100,7 +99,7 @@ class PatientSearchView(ListView):
 class PatientInputView(CreateView):
     template_name = 'app/patient_input.html'
     model = Patient
-    fields = ('pt_id','pt_name','pt_gender','pt_birthday','pt_remarks')
+    fields = ('pt_id', 'pt_name', 'pt_gender', 'pt_birthday', 'pt_remarks')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -128,12 +127,13 @@ class PatientInputView(CreateView):
         ))
         url = f'{redirect_url}?{parameters}'
         if Patient.objects.filter(pt_id=patient.pt_id):
-            if Patient.objects.filter(pt_name=patient.pt_name):
+            pt_data = Patient.objects.get(pt_id=patient.pt_id)
+            if pt_data.pt_name == patient.pt_name:
                 messages.add_message(self.request, messages.ERROR, "すでに登録済みです。")
                 return redirect(url)
             else:
                 messages.add_message(self.request, messages.ERROR, "IDが重複しています。氏名の確認お願いします。")
-                return redirect('/')
+                return render(self.request, 'app/patient_input.html', {'form': form})
         else:
             patient.save()
             messages.add_message(self.request, messages.SUCCESS, "登録しました。")
@@ -253,6 +253,7 @@ class CalendarView(mixins.MonthWithScheduleMixin, mixins.WeekWithScheduleMixin, 
     # time_field = 'start'
     opn = 8
     cls = 20
+    interval = 30
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -270,7 +271,7 @@ class CalendarView(mixins.MonthWithScheduleMixin, mixins.WeekWithScheduleMixin, 
         return context
 
 
-class RihabiriCalendarView(CalendarView):
+class RihView(CalendarView):
     opn = 10
     cls = 23
 
@@ -279,6 +280,7 @@ class RihabiriCalendarView(CalendarView):
         staff_data = get_object_or_404(Staff, id=self.kwargs['pk'])
         context['staff_data'] = staff_data
         return context
+
 
 class BookingView(CalendarView):
     model = Booking, Patient
@@ -356,6 +358,18 @@ class BookingView(CalendarView):
     #         ))
     #         url = f'{redirect_url}?{parameters}'
     #         return redirect(url)
+
+
+class RihBookingView(RihView, BookingView):
+    model = Booking, Patient
+    form_class = PatientForm
+    template_name = 'app/booking.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        return context
+
+    def
 
 
 class ThanksView(TemplateView):

@@ -73,11 +73,9 @@
                         <td scope="row">{{ hour }}:00</td>
                         {% for datetime, book in schedules.items %}
                             <td>
-                                {% is_1hour_later datetime hour as ok %}
-                                {% if not ok %}
-                                    -
-                                {% elif book|length < 1 %}
-                                    <a href="{% url 'booking' staff_data.pk datetime.year datetime.month datetime.day hour %}?pt_id={{pt_id}}&pt_name={{pt_name}}">
+
+                                {% if book|length < 1 %}
+                                    <a href="{% url 'booking' staff_data.pk datetime.year datetime.month datetime.day hour.hour hour.minute %}?pt_id={{pt_id}}&pt_name={{pt_name}}">
                                         ○
                                     </a>
                                 {% else %}

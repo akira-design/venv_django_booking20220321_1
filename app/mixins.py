@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from app.models import Store, Staff, Booking, Modality
 from django.views.generic import View
+import math
 
 
 class BaseCalendarMixin:
@@ -116,6 +117,7 @@ class WeekCalendarMixin(BaseCalendarMixin):
 class WeekWithScheduleMixin(WeekCalendarMixin):
     opn = 10
     cls = 20
+    interval = 15
     """スケジュール付きの、週間カレンダーを提供するMixin"""
     def get_week_schedules(self, start, end, days):
         staff_data = get_object_or_404(Staff, id=self.kwargs['pk'])
@@ -131,11 +133,17 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
         # 例えば、Schedule.objects.filter(date__range=(1日, 31日)) になる
         queryset = Booking.objects.filter(staff=staff_data, **lookup)
             # .exclude(Q(start__gt=end_time) | Q(end__lt=start_time))
-
+        opn = self.opn*60
+        cls = self.cls*60
+        interval = self.interval
         # day_schedules = {day: [] for day in days}
         day_schedules = {}
-        for hour in range(self.opn,self.cls):
+        # for hour in range(self.opn, self.cls):
+        for minute in range(opn, cls, interval):
             row = {}
+            math_hour = math.floor(minute/60)
+            math_minute = (minute/60-math_hour)*60
+            hour = datetime.time(int(math_hour), int(math_minute))
             for day in days:
                 row[day] = []
             day_schedules[hour] = row
