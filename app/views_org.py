@@ -137,7 +137,7 @@ class ModalityView(View):
 
 class CalendarView(mixins.MonthWithScheduleMixin, mixins.WeekWithScheduleMixin, TemplateView):
     """月間カレンダー、週間カレンダー、スケジュール登録画面のある欲張りビュー"""
-    template_name = 'app/calendar.html'
+    template_name = 'app/staff_calendar.html'
     model = Booking, Staff
     date_field = 'date'
     time_field = 'start'
@@ -164,7 +164,7 @@ class CalendarView(mixins.MonthWithScheduleMixin, mixins.WeekWithScheduleMixin, 
 class BookingView(CalendarView):
     model = Booking, Patient
     form_class = PatientForm
-    template_name = 'app/booking.html'
+    template_name = 'app/staff_booking.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -188,7 +188,7 @@ class BookingView(CalendarView):
     #     hour = self.kwargs.get('hour')
     #     form = BookingForm(request.POST or None)
     #
-    #     return render(request, 'app/booking.html', {
+    #     return render(request, 'app/staff_booking.html', {
     #         'staff_data': staff_data,
     #         'year': year,
     #         'month': month,
@@ -237,7 +237,7 @@ class BookingView(CalendarView):
                 url = f'{redirect_url}?{parameters}'
                 return redirect(url)
 
-        return render(request, 'app/booking.html', {
+        return render(request, 'app/staff_booking.html', {
             'staff_data': staff_data,
             'year': year,
             'month': month,

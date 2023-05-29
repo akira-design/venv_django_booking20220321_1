@@ -16,7 +16,7 @@
                     <div class="card-body text-center px-2 pt-2">
                         <h5 class="font-weight-bold">{{ staff.user.first_name }} {{ staff.user.last_name }}</h5>
                     </div>
-                    <a class="stretched-link" href="{% url 'calendar' staff.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                    <a class="stretched-link" href="{% url 'staff_calendar' staff.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
                 </div>
             </div>
         {% empty %}

@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from app.models import Store, Staff, Booking, Modality
 from django.views.generic import View
 import math
+from django.utils.timezone import localtime, make_aware
 
 
 class BaseCalendarMixin:
@@ -114,7 +115,7 @@ class WeekCalendarMixin(BaseCalendarMixin):
         return calendar_data
 
 
-class WeekWithScheduleMixin(WeekCalendarMixin):
+class WeekWithStaffScheduleMixin(WeekCalendarMixin):
     opn = 10
     cls = 20
     interval = 15
@@ -152,7 +153,7 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
             local_dt = timezone.localtime(schedule.start)
             schedule_date = getattr(schedule, self.date_field)
             # schedule_hour = getattr(schedule, self.time_field)
-            schedule_hour = local_dt.hour
+            schedule_hour = datetime.time(local_dt.hour, local_dt.minute)
             if (schedule_hour in day_schedules) and (schedule_date in day_schedules[schedule_hour]):
                 day_schedules[schedule_hour][schedule_date].append(schedule)
 
@@ -168,7 +169,61 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
         return calendar_context
 
 
-class MonthWithScheduleMixin(MonthCalendarMixin):
+class WeekWithModalityScheduleMixin(WeekCalendarMixin):
+    opn = 10
+    cls = 20
+    interval = 15
+    """スケジュール付きの、週間カレンダーを提供するMixin"""
+    def get_week_schedules(self, start, end, days):
+        modality_data = get_object_or_404(Modality, id=self.kwargs['pk'])
+        """それぞれの日とスケジュールを返す"""
+        lookup = {
+            # '例えば、date__range: (1日, 31日)'を動的に作る
+            '{}__range'.format(self.date_field): (start, end)
+        }
+
+        # start_time = timezone.make_aware(datetime.datetime.combine(first, time(hour=10, minute=0, second=0)))
+        # end_time = timezone.make_aware(datetime.datetime.combine(last, time(hour=20, minute=0, second=0)))
+
+        # 例えば、Schedule.objects.filter(date__range=(1日, 31日)) になる
+        queryset = Booking.objects.filter(modality=modality_data, **lookup)
+            # .exclude(Q(start__gt=end_time) | Q(end__lt=start_time))
+        opn = self.opn*60
+        cls = self.cls*60
+        interval = self.interval
+        # day_schedules = {day: [] for day in days}
+        day_schedules = {}
+        # for hour in range(self.opn, self.cls):
+        for minute in range(opn, cls, interval):
+            row = {}
+            math_hour = math.floor(minute/60)
+            math_minute = (minute/60-math_hour)*60
+            hour = datetime.time(int(math_hour), int(math_minute))
+            for day in days:
+                row[day] = []
+            day_schedules[hour] = row
+
+        for schedule in queryset:
+            local_dt = timezone.localtime(schedule.start)
+            schedule_date = getattr(schedule, self.date_field)
+            # schedule_hour = getattr(schedule, self.time_field)
+            schedule_hour = datetime.time(local_dt.hour, local_dt.minute)
+            if (schedule_hour in day_schedules) and (schedule_date in day_schedules[schedule_hour]):
+                day_schedules[schedule_hour][schedule_date].append(schedule)
+
+        return day_schedules
+
+    def get_week_calendar(self):
+        calendar_context = super().get_week_calendar()
+        calendar_context['week_day_schedules'] = self.get_week_schedules(
+            calendar_context['week_first'],
+            calendar_context['week_last'],
+            calendar_context['week_days']
+        )
+        return calendar_context
+
+
+class MonthWithStaffScheduleMixin(MonthCalendarMixin):
     """スケジュール付きの、月間カレンダーを提供するMixin"""
 
     def get_month_schedules(self, start, end, days):
@@ -207,6 +262,45 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
         return calendar_context
 
 
+class MonthWithModalityScheduleMixin(MonthCalendarMixin):
+    """スケジュール付きの、月間カレンダーを提供するMixin"""
+
+    def get_month_schedules(self, start, end, days):
+        modality_data = get_object_or_404(Modality, id=self.kwargs['pk'])
+        """それぞれの日とスケジュールを返す"""
+        lookup = {
+            # '例えば、date__range: (1日, 31日)'を動的に作る
+            '{}__range'.format(self.date_field): (start, end)
+        }
+        # 例えば、Schedule.objects.filter(date__range=(1日, 31日)) になる
+        queryset = Booking.objects.filter(modality=modality_data, **lookup)
+
+        # {1日のdatetime: 1日のスケジュール全て, 2日のdatetime: 2日の全て...}のような辞書を作る
+        day_schedules = {day: [] for week in days for day in week}
+        for schedule in queryset:
+            schedule_date = getattr(schedule, self.date_field)
+            day_schedules[schedule_date].append(schedule)
+
+        # day_schedules辞書を、周毎に分割する。[{1日: 1日のスケジュール...}, {8日: 8日のスケジュール...}, ...]
+        # 7個ずつ取り出して分割しています。
+        size = len(day_schedules)
+        return [{key: day_schedules[key] for key in itertools.islice(day_schedules, i, i+7)} for i in range(0, size, 7)]
+
+    def get_month_calendar(self):
+        calendar_context = super().get_month_calendar()
+        month_days = calendar_context['month_days']
+        month_first = month_days[0][0]
+        month_last = month_days[-1][-1]
+        # calendar_data = {'staff_data': self.get_month_schedules(current_month)}
+        # staff_data = staff_data
+        calendar_context['month_day_schedules'] = self.get_month_schedules(
+            month_first,
+            month_last,
+            month_days
+        )
+        return calendar_context
+
+
 class BookingPostMixin:
     def post(self, request, *args, **kwargs):
         staff_data = get_object_or_404(Staff, id=self.kwargs['pk'])
@@ -214,8 +308,9 @@ class BookingPostMixin:
         month = self.kwargs.get('month')
         day = self.kwargs.get('day')
         hour = self.kwargs.get('hour')
-        start_time = make_aware(datetime(year=year, month=month, day=day, hour=hour))
-        end_time = make_aware(datetime(year=year, month=month, day=day, hour=hour + 1))
+        minute = self.kwargs.get('minute')
+        start_time = make_aware(datetime(year=year, month=month, day=day, hour=hour, minute=minute))
+        end_time = make_aware(datetime(year=year, month=month, day=day, hour=hour + 1, minute=minute))
         date_field = date(year=year, month=month, day=day)
         booking_data = Booking.objects.filter(staff=staff_data, start=start_time)
         form = BookingForm(request.POST or None)

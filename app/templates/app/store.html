@@ -26,7 +26,11 @@
                         <h5 class="font-weight-bold">{{ store.name }}店</h5>
                         <p>{{ store.address }}</p>
                     </div>
-                    <a class="stretched-link" href="{% url 'staff' store.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                    {% if store.name == '放射線' %}
+                        <a class="stretched-link" href="{% url 'modality' store.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                    {% else %}
+                        <a class="stretched-link" href="{% url 'staff' store.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                    {% endif %}
                 </div>
             </div>
         {% empty %}

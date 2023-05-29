@@ -1,0 +1,77 @@
+{% extends "app/base.html" %}
+
+{% block content %}
+    <div class="text-center my-5">
+        <h1 class="mb-5">ご予約ありがとうございました。</h1>
+        <p class="mb-2">担当より予約確定のお電話がありますので、少々お待ちください。</p>
+        <p class="mb-4">ID:{{ pt_id }}</p>
+        <p class="mb-4">{{ pt_name }}</p>
+        <p class="mb-4">{{ start }}</p>
+        <a class="btn btn-primary" href="/">ホームに戻る</a>
+        <form action="" method="POST">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <button type="submit">送信</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    {% block extrajs %}
+        <script>
+            const parentCategoryElement = $('#id_parent_category');
+            const categoryElement = $('#id_category');
+            const categories = {
+                {% for parent in parentcategory_list %}
+                    '{{ parent.pk }}': [
+                        {% for category in parent.category_set.all %}
+                            {
+                                'pk': '{{ category.pk }}',
+                                'name': '{{ category.name }}'
+                            },
+                        {% endfor %}
+                    ],
+                {% endfor %}
+            };
+
+
+            const changeCategory = (select) => {
+                // 子カテゴリの選択欄を空にする。
+                categoryElement.children().remove();
+
+                // 選択した親カテゴリに紐づく子カテゴリの一覧を取得する。
+                const parentId = parentCategoryElement.val();
+                const categoryList = categories[parentId];
+
+                // 子カテゴリの選択肢を作成・追加。
+                for (const category of categoryList) {
+                    const option = $('<option>');
+                    option.val(category['pk']);
+                    option.text(category['name']);
+                    categoryElement.append(option);
+                }
+
+                // 指定があれば、そのカテゴリを選択する
+                if (select !== undefined) {
+                    categoryElement.val(select);
+                }
+            };
+
+
+            $('#id_parent_category').on('change', () => {
+                changeCategory();
+            });
+
+
+            // 入力値に問題があって再表示された場合、ページ表示時点で小カテゴリが絞り込まれるようにする
+            if (parentCategoryElement.val()) {
+                const selectedCategory = categoryElement.val();
+                changeCategory(selectedCategory);
+            }
+
+        </script>
+    {% endblock %}
+{% endblock %}
+
+

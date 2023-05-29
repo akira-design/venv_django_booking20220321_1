@@ -1,0 +1,43 @@
+{% extends "app/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="text-center my-5">
+    <div class="row mb-5">
+        <div class="col-lg-5 col-md-5 col-sm-5">
+            <h2>患者情報</h2>
+                {% for message in messages %}
+                    <h3>{{ message }}</h3>
+                {% endfor %}
+            <p>ID:{{ pt_id }}</p>
+            <p>患者名:{{ pt_name }}</p>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-5">
+            <h2>店舗一覧</h2>
+            {% for store in store_list %}
+                <div class="card img-thumbnail">
+                    <h5 class="font-weight-bold">{{ store.name }}店</h5>
+                    {% if store.name == '放射線' %}
+                        <a class="stretched-link" href="{% url 'modality' store.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                    {% else %}
+                        <a class="stretched-link" href="{% url 'staff' store.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}"></a>
+                    {% endif %}
+                </div>
+                <nav class="nav">
+                    {% for modality in store.modality_set.all %}
+                        {% if modality.name == 'CT' %}
+                            <a class="nav-link" href="{% url 'ct_order'%}?pt_id={{pt_id}}&pt_name={{pt_name}}">{{ modality.name }}</a>
+                        {% else %}
+                            <a class="nav-link" href="{% url 'mod_calendar' modality.pk %}?pt_id={{pt_id}}&pt_name={{pt_name}}">{{ modality.name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </nav>
+            {% empty %}
+                <p>まだ店舗がありません</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

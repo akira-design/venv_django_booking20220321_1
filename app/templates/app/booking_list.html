@@ -1,0 +1,41 @@
+{% extends "app/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <h1>Booking List</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>患者データ</th>
+        <th>開始時間</th>
+        <th>終了時間</th>
+        <th>スタッフ</th>
+        <th>モダリティ</th>
+        <th>備考</th>
+        <th>作成日</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for booking in bookings %}
+      <tr>
+        <td>{{ booking.pt_data }}</td>
+        <td>{{ booking.start|date:"Y/m/d H:i" }}</td>
+        <td>{{ booking.end|date:"Y/m/d H:i" }}</td>
+        <td>{{ booking.staff }}</td>
+        <td>{{ booking.modality }}</td>
+        <td>{{ booking.orders }}</td>
+        <td>{{ booking.created_at|date:"Y/m/d H:i:s" }}</td>
+      </tr>
+      <td>
+        <a href="{% url 'mod_booking' booking.modality.pk booking.start.year booking.start.month booking.start.day booking.start.hour booking.start.minute %}?pt_id={{ booking.pt_data.pt_id }}&pt_name={{ booking.pt_data.pt_name }}&category={{ booking.orders.category }}&parts={{ booking.orders.parts }}&order_remarks={{ booking.orders.order_remarks }}&created_at={{ booking.created_at }}">
+          詳細・編集
+        </a>
+      </td>
+      {% empty %}
+      <tr>
+          <td colspan="7">No bookings found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

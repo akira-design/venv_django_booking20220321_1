@@ -1,0 +1,56 @@
+
+<div class="">
+    <a href="{% url 'mod_calendar' modality_data.pk month_previous.year month_previous.month %}">前月</a>
+    {{ month_current | date:"Y年m月" }}
+    <a href="{% url 'mod_calendar' modality_data.pk month_next.year month_next.month %}">次月</a>
+    <table class="table table-sm table-light fs-7" >
+        <thead>
+            <tr>
+                {% for w in week_names %}
+                    <th>{{ w }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for week_day_schedles in month_day_schedules %}
+                <tr>
+                    {% for day, schedules in week_day_schedles.items %}
+                        {% if today == day %}
+                            <td class="table-danger">
+                                {% else %}
+                            <td>
+                        {% endif %}
+                            <div>
+                                {% if month_current.month != day.month %}
+                                    -
+                                {% else %}
+                                    <a href="{% url 'mod_calendar' modality_data.pk day.year day.month day.day %}">{{ day.day }}</a>
+                                    <p class="m-sm-0">
+                                    {% for b in schedules %}
+                                        staff{{b.staff.id}}
+                                    {% endfor %}
+                                    </p>
+                                    {% if schedules|length < 1 %}
+                                        <i class="fa-regular fa-circle text-info" style="font-size:10px"></i>
+                                    {% elif schedules|length < 8 %}
+                                        <i class="fa-solid fa-xmark" style="font-size:10px"></i>
+                                    {% else %}
+                                        <i class="fa-light fa-triangle"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- 検索フォーム -->
+    <div class="d-flex justify-content-center">
+        <form class="form-inline my-2" method="GET" action="{% url 'mod_calendar' modality_data.pk %}">
+            <input type="text" class="form-control" name="q" value="{{request.GET.q}}">
+            <button type="submit" value="search" class="btn btn-primary">検索</button>
+        </form>
+    </div>
+    <!-- 検索フォーム -->
+</div>

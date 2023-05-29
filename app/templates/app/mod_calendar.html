@@ -1,0 +1,203 @@
+{% extends "app/base.html" %}
+{% load booking %}
+
+{% block content %}
+<div class="text-center my-5">
+    <div class="row">
+        <div class="col-md-2 mb-1 text-center calendar">
+            <img src="{{ modality_data.store.image.url }}" class="img-thumbnail" alt="">
+        </div>
+
+        <div class="col-md-4 mb-1">
+            <table class="booking_table table-bordered mb-4 mx-auto">
+                <tbody>
+                <tr>
+                    <th class="header">モダリティ</th>
+                    <td class="data">{{ modality_data.name }}</td>
+                </tr>
+                <tr>
+                    <th class="header">日程</th>
+                    <td class="data">
+                        {{ year }}年{{ month }}月{{ day }}日 {{ hour }}:{{ minute }}
+                    </td>
+                </tr>
+                {% if pt_id %}
+                <tr>
+                    <th class="header">ID</th>
+                    <td class="data">
+                        {{ pt_id }}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="header">患者名</th>
+                    <td class="data">
+                        {{ pt_name }}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="header">検査部位</th>
+                    <td class="data">
+                        {{ category }}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="header">部位</th>
+                    <td class="data">
+                        {{ parts }}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="header">備考</th>
+                    <td class="data">
+                        {{ order_remarks }}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="header">作成時刻</th>
+                    <td class="data">
+                        {{ created_at }}
+                    </td>
+                </tr>
+                {% else %}
+                    {% for b in booking_data %}
+                    <tr>
+                        <th class="header">ID</th>
+                        <td class="data">
+                            {{ b.pt_data.pt_id }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="header">患者名</th>
+                        <td class="data">
+                            {{ b.pt_data.pt_name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="header">検査部位</th>
+                        <td class="data">
+                            {{ b.orders.category }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="header">部位</th>
+                        <td class="data">
+                            {{ b.orders.parts }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="header">備考</th>
+                        <td class="data">
+                            {{ b.orders.order_remarks }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="header">作成時刻</th>
+                        <td class="data">
+                            {{ b.created_at }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 検索結果の数 -->
+        <div class="col-md-4 mb-5">
+            {% if query %}
+            <h3>検索結果</h3>
+                {% for b in books %}
+                    <p class="text-center font-weight-bold h6">
+                        {{ b.date }}
+                        {{ b.pt_name }}
+                        {{ b.staff.user.first_name }}
+                    </p>
+                {% endfor %}
+            {% endif%}
+        </div>
+        <!-- 検索結果の数 -->
+    </div>
+
+    <div class="m-0">
+        <p>{{ week_first }}～{{ week_last }}</p>
+    </div>
+
+    <div class="d-flex mb-2">
+        <div class="mx-3 mr-auto">
+            <a class="btn btn-warning" href="{% url 'mod_calendar' modality_data.pk week_previous.year week_previous.month week_previous.day %}?pt_id={{pt_id}}&pt_name={{pt_name}}">前週</a>
+        </div>
+        <div class="mx-3">
+            <a class="btn btn-warning" href="{% url 'mod_calendar' modality_data.pk week_next.year week_next.month week_next.day %}?pt_id={{pt_id}}&pt_name={{pt_name}}">次週</a>
+        </div>
+    </div>
+
+    <div class="">
+        <table class="table table-bordered bg-light">
+            <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    {% for day in week_days %}
+                        {% if day.weekday == 5 %}
+                            <th scope="col" class="text-primary">{{ day | date:"d(D)" }}</th>
+                        {% elif day.weekday == 6 %}
+                            <th scope="col" class="text-danger">{{ day | date:"d(D)" }}</th>
+                        {% else %}
+                            <th scope="col">{{ day | date:"d(D)" }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for hour, schedules in week_day_schedules.items %}
+                    <tr>
+                        <td scope="row">{{ hour }}:00</td>
+                        {% for dt, book in schedules.items %}
+                            <td>
+                                {% is_1hour_later dt hour as ok %}
+
+                                {% if not ok %}
+                                    -
+                                {% elif book|length < 1 %}
+                                    <a href="{% url 'mod_booking' modality_data.pk dt.year dt.month dt.day hour.hour hour.minute %}?pt_id={{pt_id}}&pt_name={{pt_name}}&category={{category}}&order_remarks={{order_remarks}}&parts={{parts}}&created_at={{created_at}}">
+                                        ○
+                                    </a>
+                                {% elif pt_id %}
+                                    {% for b in book %}
+                                        {% if b.pt_data.pt_name == pt_name %}
+                                            <a href="{% url 'mod_booking' modality_data.pk dt.year dt.month dt.day hour.hour hour.minute %}?pt_id={{b.pt_id}}&pt_name={{pt_name}}&category={{category}}&order_remarks={{order_remarks}}&parts={{parts}}&created_at={{b.created_at}}" class="fs-7 m-sm-0">
+                                                <span style="display: block; margin-bottom: -3px;">ID:{{b.pt_data.pt_id}}</span>
+                                                <span style="display: block; margin-bottom: -3px;">氏名:{{b.pt_data.pt_name}}</span>
+                                                <span style="display: block; margin-bottom: -3px;">モダリティ:{{b.modality}}</span>
+                                                <span style="display: block; margin-bottom: -3px;">詳細指示:{{b.orders.parts}}</span>
+                                                <span style="display: block; margin-bottom: -3px;">詳細指示:{{b.orders.order_remarks}}</span>
+                                                <span style="display: block;">データ:{{b.created_at}}</span>
+                                            </a>
+                                        {% else %}
+                                            <a>✕</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    {% for b in book %}
+                                        <a href="{% url 'mod_booking' modality_data.pk dt.year dt.month dt.day hour.hour hour.minute %}?pt_id={{pt_id}}&pt_name={{pt_name}}&category={{category}}&order_remarks={{order_remarks}}&parts={{parts}}" class="fs-7 m-sm-0">
+                                            <span style="display: block; margin-bottom: -3px;">ID:{{b.pt_data.pt_id}}</span>
+                                            <span style="display: block; margin-bottom: -3px;">氏名:{{b.pt_data.pt_name}}</span>
+                                            <span style="display: block; margin-bottom: -3px;">モダリティ:{{b.modality}}</span>
+                                            <span style="display: block; margin-bottom: -3px;">詳細指示:{{b.orders.parts}}</span>
+                                            <span style="display: block; margin-bottom: -3px;">詳細指示:{{b.orders.order_remarks}}</span>
+                                            <span style="display: block;">データ:{{b.created_at}}</span>
+                                        </a>
+                                    {% endfor %}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block month %}
+    {% include "include/include_month_mod_calendar.html" %}
+{% endblock %}

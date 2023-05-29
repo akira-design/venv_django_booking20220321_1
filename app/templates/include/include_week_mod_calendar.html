@@ -1,0 +1,51 @@
+{% load booking %}
+<div class="d-flex mb-2">
+    <div class="mx-0 mx-auto mt-2">
+        <a href="{% url 'mod_booking' modality_data.pk week_previous.year week_previous.month week_previous.day %}">前週</a>
+    </div>
+    <div class="mx-0 mx-auto mt-2">
+        <a href="{% url 'mod_booking' modality_data.pk week_next.year week_next.month week_next.day %}">次週</a>
+    </div>
+</div>
+<div class="">
+        <table class="table table-sm-booking table-dark">
+            <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    {% for day in week_days %}
+                        {% if day.weekday == 5 %}
+                            <th scope="col" class="p-0 text-primary">{{ day | date:"d" }}</th>
+                        {% elif day.weekday == 6 %}
+                            <th scope="col" class="p-0 text-danger">{{ day | date:"d" }}</th>
+                        {% else %}
+                            <th scope="col" class="p-0">{{ day | date:"d" }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for hour, schedules in week_day_schedules.items %}
+                    <tr>
+                        <td scope="row" class="p-0" style="font-size:10px">{{ hour | date:"H:i" }}</td>
+                        {% for dt, book in schedules.items %}
+                            <td class="p-0" style="font-size:10px">
+                                {% is_1hour_later dt hour as ok %}
+
+                                {% if not ok %}
+                                    -
+                                {% elif book|length < 1 %}
+                                    <a href="{% url 'mod_booking' modality_data.pk dt.year dt.month dt.day hour.hour hour.minute %}" class="p-0" style="font-size:10px">
+                                        ○
+                                    </a>
+                                {% else %}
+                                    {% for b in book %}
+                                        {{b.pt_name}}
+                                    {% endfor %}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>

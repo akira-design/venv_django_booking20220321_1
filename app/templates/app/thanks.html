@@ -2,12 +2,61 @@
 
 {% block content %}
 
-<div class="text-center my-5">
-    <h1 class="mb-5">ご予約ありがとうございました。</h1>
-    <p class="mb-2">担当より予約確定のお電話がありますので、少々お待ちください。</p>
-    <p class="mb-4">ID:{{ pt_id }}</p>
-    <p class="mb-4">{{ pt_name }}</p>
-    <p class="mb-4">{{ start }}</p>
+<div class="text-center my-3">
+    <h3 class="mb-2">ご予約ありがとうございました。</h3>
+    <h5 class="card-title">予約情報</h5>
+    <table class="booking_table table-bordered mb-4 mx-auto">
+        <tbody>
+            <tr>
+                <th class="header">部門</th>
+                <td class="data">{{ modality_data.name }}店</td>
+            </tr>
+            <tr>
+                <th class="header">スタッフ</th>
+                <td class="data">{{ staff_data.user.first_name }} {{ staff_data.user.last_name }}</td>
+            </tr>
+            <tr>
+                <th class="header px-2">モダリティ</th>
+                <td class="data">{{ modality_data.name }}</td>
+            </tr>
+            <tr>
+                <th class="header">予約日</th>
+                <td class="data">
+                    {{ start }}
+                </td>
+            </tr>
+            <tr>
+                <th class="header">ID</th>
+                <td class="data">
+                    {{ pt_id }}
+                </td>
+            </tr>
+            <tr>
+                <th class="header">患者名</th>
+                <td class="data">
+                    {{ pt_name }}
+                </td>
+            </tr>
+            <tr>
+                <th class="header">パーツ</th>
+                <td class="data">
+                    {{ parts }}
+                </td>
+            </tr>
+            <tr>
+                <th class="header">カテゴリ</th>
+                <td class="data">
+                    {{ category }}
+                </td>
+            </tr>
+            <tr>
+                <th class="header">備考</th>
+                <td class="data">
+                    {{ order_remarks }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
     <a class="btn btn-primary" href="/">ホームに戻る</a>
 </div>
 {% endblock %}

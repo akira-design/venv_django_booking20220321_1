@@ -30,10 +30,24 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'patient_input' %}?pt_id={{pt_id}}&pt_name={{pt_name}}">患者登録</a>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">オーダー</a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#!">XP</a></li>
+                        {% if category is None %}
+                            <li><a class="dropdown-item" href="{% url 'ct_order' %}?pt_id={{pt_id}}&pt_name={{pt_name}}">CT</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'ct_order' %}?pt_id={{pt_id}}&pt_name={{pt_name}}&category={{category}}&order_remarks={{order_remarks}}&parts={{parts}}">CT</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="#!">MRI</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'store' %}?pt_id={{pt_id}}&pt_name={{pt_name}}">部門</a>
                 </li>
-
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'booking_list' %}">一覧</a>
+                </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'profile' %}">プロフィール</a>
