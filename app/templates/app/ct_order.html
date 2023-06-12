@@ -71,121 +71,59 @@
     <div class="text-center col-lg-6 col-md-6 my-3">
         <h5 class="card-title">オーダー</h5>
         <form action="" method="POST">
-            <style>
-                .wrap {
-                  margin: 2em 0;
-                  padding: 0;
-                }
 
-                .wrap label {
-                  display: block;
-                  padding : 8px;
-                  color: #fff;
-                  font-weight: bold;
-                  background: #999;
-                  cursor: pointer;
-                }
-
-                .wrap input[type="checkbox"] {
-                  display: none;
-                }
-
-                .wrap .content {
-                  height: 0;
-                  padding: 0;
-                  overflow: hidden;
-                  margin-bottom: 10px;
-                  border: 1px solid #ccc;
-                }
-
-                .content .label-sm{
-                    display: inline; /* ブロックレベル要素化する */
-                    float: left; /* 要素の左寄せ・回り込を指定する */
-                    margin-left: 3px; /* ラベル外側の余白を指定する */
-                    margin-rihgt: 3px; /* ラベル外側の余白を指定する */
-                    width: 120px; /* ラベルの横幅を指定する */
-                    height: auto;
-                    line-height: 20px;
-                    text-align: center; /* テキストのセンタリングを指定する */
-                    padding: 0;
-
-                    cursor: pointer; /* マウスカーソルの形（リンクカーソル）を指定する */
-
-                    border: 2px solid #006DD9;/* ラベルの境界線を実線で指定する */
-                    border-radius: 20px; /* 角丸を指定する */
-                    color: #006DD9; /* マウス選択時のフォント色を指定する */
-                    background: #ffffff;
-                }
-
-                .switch:checked + .content {
-                  height: auto;
-                  padding: 8px;
-                  background: #f7f7f7;
-                }
-
-                .input[type="checkbox"]:checked + .label-sm {
-                    background: #31A9EE;/* マウス選択時の背景色を指定する */
-                    color: #ffffff; /* マウス選択時のフォント色を指定する */
-                }
-            </style>
             <div class="wrap">
                 <!-- １つ目 -->
-                <label for="label1">▼ クリックで展開1</label>
-                <input type="checkbox" id="label1" class="switch" />
+                <label for="label4">外科・内科・循環器内科・神経内科　領域</label>
+                <input type="checkbox" id="label4" class="input">
                 <!-- ↓↓最初隠したいコンテンツ↓↓ -->
                 <div class="content">
                 <table>
-                    <tr class="pb-3">
-                        <th>脊椎</th>
+                    <tr>
+                        <th width="80">頭部</th>
                         <td>
-                            <input class="input" type="checkbox" name="parts" value="腰椎" id="n_spine">
-                            <label class="label-sm" for="n_spine">頸椎</label>
-                            <input class="input" type="checkbox" name="parts" value="胸椎" id="t_spine">
-                            <label class="label-sm" for="t_spine">胸椎</label>
-                            <input class="input" type="checkbox" name="parts" value="胸腰椎移行部" id="tl_spine">
-                            <label class="label-sm" for="tl_spine">胸腰椎移行部</label>
-                            <input class="input" type="checkbox" name="parts" value="腰椎" id="l_spine">
-                            <label class="label-sm" for="l_spine">腰椎</label>
+                            <input class="input" type="checkbox" name="parts" value="脳" id="brain" />
+                            <label class="label-sm" for="brain">脳</label>
+                            <input class="input" type="checkbox" name="parts" value="眼窩" id="orbit" />
+                            <label class="label-sm" for="orbit">眼窩</label>
+                            <input class="input" type="checkbox" name="parts" value="副鼻空" id="sinus" />
+                            <label class="label-sm" for="sinus">副鼻腔</label>
                         </td>
                     </tr>
-                    <tr class="pb-3">
-                        <th>上腕</th>
+                    <tr>
+                        <th width="80">頚部胸部</th>
                         <td>
-                            <input class="input" type="checkbox" name="parts" value="肩" id="shoulder">
-                            <label class="label-sm" for="shoulder">肩</label>
-                            <input class="input" type="checkbox" name="parts" value="上腕" id="upper_arm">
-                            <label class="label-sm" for="upper_arm">上腕</label>
+                            <input class="input" type="checkbox" name="parts" value="頚部" id="neck" />
+                            <label class="label-sm" for="neck">頚部</label>
+                            <input class="input" type="checkbox" name="parts" value="甲状腺" id="thiroid" />
+                            <label class="label-sm" for="thiroid">甲状腺</label>
+                            <input class="input" type="checkbox" name="parts" value="肺" id="lung" />
+                            <label class="label-sm" for="lung">肺</label>
+                            <input class="input" type="checkbox" name="parts" value="縦隔" id="mediastinum" />
+                            <label class="label-sm" fr="mediastinum">縦隔</label>
+                            <input class="input" type="checkbox" name="parts" value="甲状腺" id="thiroid" />
+                            <label class="label-sm" for="thiroid">甲状腺</label>
+                            <input class="input" type="checkbox" name="parts" value="甲状腺" id="thiroid" />
+                            <label class="label-sm" for="thiroid">甲状腺</label>
                         </td>
                     </tr>
-                    <tr class="pb-3">
-                        <th>下肢</th>
-                        <td>
-                            <input class="input" type="checkbox" name="parts" value="大腿" id="femur">
-                            <label class="label-sm" for="femur">大腿</label>
-                            <input class="input" type="checkbox" name="parts" value="膝" id="knee">
-                            <label class="label-sm" for="knee">膝</label>
-                            <input class="input" type="checkbox" name="parts" value="下腿" id="lower_leg">
-                            <label class="label-sm" for="lower_leg">下腿</label>
-                        </td>
+                    <tr>
+                        {% csrf_token %}
+                        <th width="80">カテゴリー</th>
+                        <td align="left">{{ form.category }}</td>
                     </tr>
-                    <tr class="pb-1">
-                        <th>カテゴリ</th>
-                        <td align="left">
-                            {% csrf_token %}
-                            {{ form.category }}
-                        </td>
+                    <tr>
+                        <th width="80">備考</th>
+                        <td align="left">{{ form.order_remarks }}</td>
                     </tr>
-                    <tr class="pb-1">
-                        <th>備考</th>
+                    <tr>
+                        <th width="80">日未定</th>
                         <td>
-                            {% csrf_token %}
-                            {{ form.order_remarks }}
+                            {{ form.undecided_date }}
                         </td>
                     </tr>
                 </table>
                 </div>
-                <!-- ↑↑最初隠したいコンテンツ ↑↑-->
-            </div>
             <button class="btn btn-lg btn-warning btn-block" type="submit">予約確定</button>
          </form>
     </div>

@@ -2,40 +2,77 @@
 {% load widget_tweaks %}
 
 {% block content %}
-  <h1>Booking List</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>患者データ</th>
-        <th>開始時間</th>
-        <th>終了時間</th>
-        <th>スタッフ</th>
-        <th>モダリティ</th>
-        <th>備考</th>
-        <th>作成日</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for booking in bookings %}
-      <tr>
-        <td>{{ booking.pt_data }}</td>
-        <td>{{ booking.start|date:"Y/m/d H:i" }}</td>
-        <td>{{ booking.end|date:"Y/m/d H:i" }}</td>
-        <td>{{ booking.staff }}</td>
-        <td>{{ booking.modality }}</td>
-        <td>{{ booking.orders }}</td>
-        <td>{{ booking.created_at|date:"Y/m/d H:i:s" }}</td>
-      </tr>
-      <td>
-        <a href="{% url 'mod_booking' booking.modality.pk booking.start.year booking.start.month booking.start.day booking.start.hour booking.start.minute %}?pt_id={{ booking.pt_data.pt_id }}&pt_name={{ booking.pt_data.pt_name }}&category={{ booking.orders.category }}&parts={{ booking.orders.parts }}&order_remarks={{ booking.orders.order_remarks }}&created_at={{ booking.created_at }}">
-          詳細・編集
-        </a>
-      </td>
-      {% empty %}
-      <tr>
-          <td colspan="7">No bookings found.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<script>
+function setSortOrder(paramName, isAscending) {
+    let sortOrder = isAscending ? paramName : '-' + paramName;
+    let searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('sort_by', sortOrder);
+    window.location.search = searchParams.toString();
+}
+</script>
+<div class="row">
+    <table>
+        <thead class="small">
+            <form method="GET" action=".">
+            <tr>
+            <th class="th-patient-data">
+                患者ID<br>
+                <input type="text" name="pt_id" value="{{ pt_id }}" class="col-6">
+            </th>
+            <th>患者名</th>
+            <th class="th-start-time">
+                開始時間<br>
+                <button type="button" onclick="setSortOrder('start', true)">&#x2191;</button>
+                <button type="button" onclick="setSortOrder('start', false)">&#x2193;</button>
+            </th>
+            <th>終了時間</th>
+            <th>スタッフ</th>
+            <th>
+                モダリティ<br>
+                <select name="modality">
+                    <option value="">すべて</option>
+                    <option value="XP">XP</option>
+                    <option value="CT">CT</option>
+                    <option value="MRI">MRI</option>
+                </select>
+            </th>
+            <th>
+                検査部位<br>
+                <input type="text" name="parts" value="{{ parts }}"  class="col-6">
+            </th>
+            <th>
+                作成日<br>
+                <button type="button" onclick="setSortOrder('created_at', true)">&#x2191;</button>
+                <button type="button" onclick="setSortOrder('created_at', false)">&#x2193;</button>
+            </th>
+            <th>
+                検索<br>
+                <button type="submit">検索</button>
+            </th>
+            </tr>
+            </form>
+        </thead>
+        <tbody class="small">
+            {% for object in object_list %}
+                <tr>
+                <td>{{ object.pt_data.pt_id }}</td>
+                <td>{{ object.pt_data.pt_name }}</td>
+                <td>{{ object.start|date:"Y/m/d H:i" }}</td>
+                <td>{{ object.end|date:"Y/m/d H:i" }}</td>
+                <td>{{ object.staff }}</td>
+                <td>{{ object.modality.name }}</td>
+                <td>{{ object.orders.parts }}</td>
+                <td>{{ object.created_at|date:"Y/m/d H:i:s" }}</td>
+                <td><button type="submit"onclick="location.href='{% url 'mod_order' object.modality.pk object.start|date:'Y' object.start|date:'m' object.start|date:'d' object.start|date:'H' object.start|date:'i' %}?pt_id={{ object.pt_data.pt_id }}&pt_name={{ object.pt_data.pt_name }}&category={{ object.orders.category }}&parts={{ parts }}&order_remarks={{ object.orders.order_remarks }}&created_at={{ object.created_at }}:{{ object.created_at.second }}'">詳細・編集</button>
+                </td>
+                </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No bookings found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

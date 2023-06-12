@@ -678,10 +678,31 @@ class MyPageView(CalendarView):
 
 
 class BookingListView(ListView):
+    template_name = 'app/booking_list.html'
     model = Booking
-    template_name = 'booking_list.html'
-    context_object_name = 'bookings'
-    ordering = ['date', 'start']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        pt_id = self.request.GET.get('pt_id')
+        modality = self.request.GET.get('modality')
+        staff = self.request.GET.get('staff')
+        parts = self.request.GET.get('parts')
+        sort_by = self.request.GET.get('sort_by', 'start')
+
+        if pt_id:
+            queryset = queryset.filter(pt_data__pt_id=pt_id)
+        if modality:
+            queryset = queryset.filter(modality__id=modality)
+        if staff:
+            queryset = queryset.filter(staff__id=staff)
+        if parts:
+            queryset = queryset.filter(orders__parts=parts)
+
+        if sort_by:
+            queryset = queryset.order_by(sort_by)
+
+        return queryset
 
 
 @require_POST

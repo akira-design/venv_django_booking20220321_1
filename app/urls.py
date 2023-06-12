@@ -21,6 +21,7 @@ urlpatterns = [
     # path('booking/<int:pk>/<int:year>/<int:month>/<int:day>/', views.BookingView.as_view(), name='booking'),
     path('mod_booking/<int:pk>/<int:year>/<int:month>/<int:day>/', views.ModBookingView.as_view(), name='mod_booking'),
     path('mod_booking/', views.ModBookingView.as_view(), name='mod_booking'),
+    path('mod_order/<int:pk>/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/', views.ModBookingView.as_view(), name='mod_order'),
     path('thanks/', views.ThanksView.as_view(), name='thanks'),
 
     path('staff_booking/<int:pk>/<int:year>/<int:month>/<int:day>/', views.StaffBookingView.as_view(), name='staff_booking'),

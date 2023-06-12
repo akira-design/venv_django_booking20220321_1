@@ -11743,3 +11743,63 @@ body {
 input[type="checkbox"]:checked + .message{
   display: block;
 }
+
+.wrap > label {
+  display: block;
+  padding : 4px;
+  color: #fff;
+  font-weight: bold;
+  background: #999;
+  cursor: pointer;
+}
+
+.wrap .input[type="checkbox"] {
+  display: none;
+}
+
+.wrap .content label.label-sm {
+  display: inline-block;
+  border-radius: 20px;
+  text-align: center;
+  text-decoration: none;
+  border: solid 1px #ccc;
+  transition: 0.25s;
+  padding-left: 5px;
+  padding-right: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 3px;
+  float: left; /* 要素の左寄せ・回り込を指定する */
+  width: 100px; /* ラベルの横幅を指定する */
+  background: #ffffff;
+}
+
+.wrap .input[type="checkbox"]:checked + .label-sm {
+  background: #31A9EE;
+  color: #ffffff;
+}
+
+.center {
+  max-width:25rem;
+  min-width:15rem;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.wrap {
+  padding: 0;
+}
+
+.wrap .content {
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  transition: height 0.2s ease-out;
+}
+
+.wrap .input[type="checkbox"]:checked ~ .content {
+  height: auto;
+  padding: 8px;
+}
