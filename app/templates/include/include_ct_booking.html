@@ -37,6 +37,11 @@
                 </td>
             </tr>
             <tr>
+            <th class="header">部位</th>
+                <td class="data">
+                    {{ parts }}
+                </td>
+            </tr>
             <tr>
                 <th class="header">備考</th>
                 <td class="data">
@@ -46,12 +51,7 @@
             <tr>
                 <th class="header">作成時刻</th>
                 <td class="data">
-                    {{ created_at }}
-                <th class="header">部位</th>
-                <td class="data">
-                    {{ parts }}
-                </td>
-            </tr>:{{ created_at.second }}
+                    {{ created_at }}:{{ created_at.second }}
                 </td>
             </tr>
             {% else %}
