@@ -63,7 +63,7 @@ function setSortOrder(paramName, isAscending) {
                 <td>{{ object.modality.name }}</td>
                 <td>{{ object.orders.parts }}</td>
                 <td>{{ object.created_at|date:"Y/m/d H:i:s" }}</td>
-                <td><button type="submit"onclick="location.href='{% url 'mod_booking' object.modality.pk object.start|date:'Y' object.start|date:'m' object.start|date:'d' object.start|date:'H' object.start|date:'i' %}?pt_id={{ object.pt_data.pt_id }}&pt_name={{ object.pt_data.pt_name }}&category={{ object.orders.category }}&parts={{ parts }}&order_remarks={{ object.orders.order_remarks }}&created_at={{ object.created_at }}:{{ object.created_at.second }}&start_time={{ object.start_time }}'">詳細・編集</button>
+                <td><button type="submit"onclick="location.href='{% url 'mod_booking' object.modality.pk object.start|date:'Y' object.start|date:'m' object.start|date:'d' object.start|date:'H' object.start|date:'i' %}?pt_id={{ object.pt_data.pt_id }}&pt_name={{ object.pt_data.pt_name }}&category={{ object.orders.category }}&parts={{ parts }}&order_remarks={{ object.orders.order_remarks }}&created_at={{ object.created_at }}:{{ object.created_at.second }}&start_time={{ object.start }}'">詳細・編集</button>
                 </td>
                 </tr>
             {% empty %}

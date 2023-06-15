@@ -458,6 +458,7 @@ class ModBookingView(CreateView):
         context['day'] = day
         context['hour'] = hour
         context['minute'] = minute
+        context['start_time'] = start_time
         context['parentcategory_list'] = ParentCategory.objects.all()
         return context
 
@@ -495,7 +496,7 @@ class ModBookingView(CreateView):
             category=category,
             parts=parts,
             order_remarks=order_remarks,
-            # start=start_time.strftime('%Y年%m月%d日 %H時:%M分'),
+            start_time=start_time.strftime('%Y年%m月%d日 %H時:%M分'),
             created_at=created_at
         ))
 
@@ -533,7 +534,7 @@ class ModBookingView(CreateView):
                 # created_at = Booking.objects.latest('created_at').created_at
                 # created_at_date = datetime.strptime(created_at, '%Y年%m月%d日%H:%M')
                 data = {
-                    "start": start_time,
+                    "start_time": start_time,
                     "date": date(
                         year=start_time.year,
                         month=start_time.month,
